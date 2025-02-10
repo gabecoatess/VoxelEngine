@@ -13,3 +13,6 @@ Makefile
 
 # Build directories
 build/
+
+# Externals
+external/glfw/build
