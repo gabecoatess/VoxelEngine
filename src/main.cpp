@@ -1,35 +1,10 @@
+// main.cpp
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-// Temporary Vertex Program
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 data;\n"
-"out vec3 datas;\n"
-"void main()\n"
-"{\n"
-"   datas = data;\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-// Temporary Fragment Program
-const char* fragmentShaderSource = "#version 330 core\n"
-"in vec3 datas;\n"
-"out vec4 FragColor;\n\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(datas.x, datas.y, datas.z, 1.0);\n"
-"}\0";
-
-// Temporary Fragment Program Yellow
-const char* fragmentShaderYellowSource = "#version 330 core\n"
-"in vec3 datas;\n"
-"out vec4 FragColor;\n\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n"
-"}\0";
+#include "utilities/Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -164,71 +139,8 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(1);
 
-    // Configure the shader
-    unsigned int vertexShader;
-    unsigned int fragmentShader;
-    unsigned int fragmentYellowShader;
-
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    fragmentYellowShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glShaderSource(fragmentYellowShader, 1, &fragmentShaderYellowSource, NULL);
-    glCompileShader(fragmentYellowShader);
-
-    // Error checking for vertex shader
-    int successV;
-    char infoLogV[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &successV);
-
-    if (!successV)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLogV);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLogV << "\n";
-    }
-
-    // Error checking for fragment shader
-    int successF;
-    char infoLogF[512];
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &successF);
-
-    if (!successF)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLogF);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLogF << "\n";
-    }
-
-    // Error checking for fragment yellow shader
-    int successFY;
-    char infoLogFY[512];
-    glGetShaderiv(fragmentYellowShader, GL_COMPILE_STATUS, &successFY);
-
-    if (!successFY)
-    {
-        glGetShaderInfoLog(fragmentYellowShader, 512, NULL, infoLogFY);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLogFY << "\n";
-    }
-
-    // Create shader program
-    unsigned int shaderProgram;
-    unsigned int yellowShaderProgram;
-    shaderProgram = glCreateProgram();
-    yellowShaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-
-    glAttachShader(yellowShaderProgram, vertexShader);
-    glAttachShader(yellowShaderProgram, fragmentYellowShader);
-
-    glLinkProgram(shaderProgram);
-    glLinkProgram(yellowShaderProgram);
+    Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
+    Shader yellowShader("default_vertex.glsl", "yellow_fragment.glsl");
 
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
@@ -236,25 +148,40 @@ int main() {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+        // Clear the back buffer with the color bit set earlier
         glClear(GL_COLOR_BUFFER_BIT);
             
+        // Process input
         processInput(window);
 
-        glUseProgram(shaderProgram);
+        // Calculating time value and sine value
+        float timeValue = glfwGetTime();
+        float sineValue = sin(timeValue) * 0.8f;
+
+        // Use default shader and set top offset uniform
+        normalShader.use();
+        normalShader.setVec3f("topOffset", sineValue, 0.0f, 0.0f);
+
+        // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUseProgram(yellowShaderProgram);
+        // Use the yellow shader and set the app colors uniform
+        yellowShader.use();
+        yellowShader.setVec4f("appColors", sineValue, sineValue, 0, 0);
+
+        // Bind the second top right triangle and draw it
         glBindVertexArray(VAO2);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        // Swap the front buffer and back buffer
         glfwSwapBuffers(window);
+
+        // Check for any events
         glfwPollEvents();
     }
 
     // Cleanup and exit
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
     glfwDestroyWindow(window);
     glfwTerminate();
 
