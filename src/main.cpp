@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "utilities/Shader.h"
+#include "thirdparty/stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -76,23 +77,48 @@ int main() {
 
     // Triangle data
     float triangleOne[] = {
-        -0.5f, -0.5f, 0.0f, // bottom left
-        0.5f, -0.5f, 0.0f, // bottom right
-        -0.5f, 0.5f, 0.0f, // top left
+        // POSITIONS            // COLORS           // TEXCOORDS  
+         0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // TOP RIGHT
+         0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // BOTTOM RIGHT
+        -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // BOTTOM LEFT
+        -0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 0.0f,   0.0f, 1.0f, // TOP LEFT
+    };
+    unsigned int indices[] = {
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
     };
 
-    float triangleTwo[] = {
-        -0.5f, 0.5f, 0.0f, // top left
-        0.5f, -0.5f, 0.0f, // bottom right
-        0.5f, 0.5f, 0.0f, // top right
-    };
+    // Triangle Texture Object
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
-    // Color data
-    float colorData[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f,
-    };
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    // Load the texture data
+    int textureWidth;
+    int textureHeight;
+    int numOfColorChannels;
+    stbi_set_flip_vertically_on_load(true);
+
+    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/test_texture.png";
+    unsigned char* data = stbi_load(imagePath.c_str(), & textureWidth, & textureHeight, & numOfColorChannels, 0);
+
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        //glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Texture image data did not load successfully: " << imagePath << '\n';
+    }
+
+    // Free memory 
+    stbi_image_free(data);
 
     // ==================================
     // Triangle ONE
@@ -107,40 +133,27 @@ int main() {
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleOne), triangleOne, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    // Position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Generate VBO for color
-    unsigned int ColorVBO;
-    glGenBuffers(1, &ColorVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, ColorVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colorData), colorData, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    // Color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // Texcoord
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Generate EBO to go into VAO
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
-    // ==================================
-    // Triangle TWO
-    // ==================================
-    // Generate VAO2
-    unsigned int VAO2;
-    glGenVertexArrays(1, &VAO2);
-    glBindVertexArray(VAO2);
-
-    // Generate VBO to go into VAO2
-    unsigned int VBO2;
-    glGenBuffers(1, &VBO2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleTwo), triangleTwo, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Bind the same ColorVBO to VAO2
-    glBindBuffer(GL_ARRAY_BUFFER, ColorVBO);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-    glEnableVertexAttribArray(1);
 
     Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
-    Shader yellowShader("default_vertex.glsl", "yellow_fragment.glsl");
 
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
@@ -154,25 +167,16 @@ int main() {
         // Process input
         processInput(window);
 
-        // Calculating time value and sine value
-        float timeValue = glfwGetTime();
-        float sineValue = sin(timeValue) * 0.8f;
-
         // Use default shader and set top offset uniform
         normalShader.use();
-        normalShader.setVec3f("topOffset", sineValue, 0.0f, 0.0f);
+
+        // Bind the texture
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        // Use the yellow shader and set the app colors uniform
-        yellowShader.use();
-        yellowShader.setVec4f("appColors", sineValue, sineValue, 0, 0);
-
-        // Bind the second top right triangle and draw it
-        glBindVertexArray(VAO2);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // Swap the front buffer and back buffer
         glfwSwapBuffers(window);
