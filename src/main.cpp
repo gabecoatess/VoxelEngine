@@ -161,27 +161,54 @@ int main() {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        // Clear the back buffer with the color bit set earlier
-        glClear(GL_COLOR_BUFFER_BIT);
-            
-        // Process input
+        // =============================
+        // Input
+        //
         processInput(window);
 
-        // Use default shader and set top offset uniform
+        // =============================
+        // Render
+        //
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+            
+        // =============================
+        // Collect time
+        //
+        float timeValue = glfwGetTime();
+        float sineValue = sin(timeValue) * 100.0f;
+
+        // =============================
+        // Active Default Shader
+        //
         normalShader.use();
 
+        // =============================
+        // =============================
+        // Setup Model Textures
+        //
         // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
 
+
+        // =============================
+        // Draw the objects
+        // 
         // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
+
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        // =============================
+        // Finish rendering
+        // 
         // Swap the front buffer and back buffer
         glfwSwapBuffers(window);
 
+        // =============================
         // Check for any events
+        //
         glfwPollEvents();
     }
 
