@@ -2,6 +2,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 #include "utilities/Shader.h"
@@ -152,13 +155,10 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
-
     Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
 
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
     glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-
+    
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         // =============================
@@ -171,7 +171,7 @@ int main() {
         //
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-            
+
         // =============================
         // Collect time
         //
@@ -184,6 +184,31 @@ int main() {
         normalShader.use();
 
         // =============================
+        // Create Transformations
+        // 
+        // Model Matrix
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 100.0f)), glm::vec3(1.0f, 0.0f, 1.0f));
+
+        // View Matrix
+        glm::mat4 viewMatrix = glm::mat4(1.0f);
+        viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0));
+
+        // Projection Matrix
+        glm::mat4 projectionMatrix;
+        projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        // Send matrices to the default shader
+        int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+        int viewLoc = glGetUniformLocation(normalShader.Id, "sViewMatrix");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+        int projectionLoc = glGetUniformLocation(normalShader.Id, "sProjectionMatrix");
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
         // =============================
         // Setup Model Textures
         //
