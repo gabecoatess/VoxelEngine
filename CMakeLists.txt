@@ -15,13 +15,13 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_subdirectory(external/glfw)
 
 # Add GLAD as a library
-add_library(glad external/glad/src/glad.c "src/utilities/Shader.h" "src/utilities/Shader.cpp")
+add_library(glad external/glad/src/glad.c "src/utilities/Shader.h" "src/utilities/Shader.cpp" "src/thirdparty/stb_image.h" "src/thirdparty/stb_image.cpp")
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 
 # System Dependencies (OS provided)
 find_package(OpenGL REQUIRED)
 
 # Executable
-add_executable(VoxelEngine src/main.cpp "src/utilities/Shader.h" "src/utilities/Shader.cpp")
+add_executable(VoxelEngine src/main.cpp "src/utilities/Shader.h" "src/utilities/Shader.cpp" "src/thirdparty/stb_image.h" "src/thirdparty/stb_image.cpp")
 
 target_link_libraries(VoxelEngine PRIVATE glfw glad OpenGL::GL)
