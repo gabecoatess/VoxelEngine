@@ -30,9 +30,19 @@ float lastX = 800.0f * 0.5f;
 float lastY = 600.0f * 0.5f;
 float fieldOfView = 90.0f;
 
+// ===========================
+// Window Settings
+//
+const int WIN_WIDTH = 1280;
+const int WIN_HEIGHT = 1280;
+int currentWinWidth = WIN_WIDTH;
+int currentWinHeight = WIN_HEIGHT;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+    currentWinWidth = width;
+    currentWinHeight = height;
+    glViewport(0, 0, currentWinWidth, currentWinHeight);
 }
 
 int currentDrawMode = 0;
@@ -145,9 +155,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a window with OpenGL context
-    const int WIN_WIDTH = 1280;
-    const int WIN_HEIGHT = 1280;
-    GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "GLFW Test Window", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(currentWinWidth, currentWinHeight, "GLFW Test Window", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -301,7 +309,7 @@ int main() {
 
     Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
 
-    glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
+    glViewport(0, 0, currentWinWidth, currentWinHeight);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
@@ -338,10 +346,6 @@ int main() {
         normalShader.use();
 
         // =============================
-        // Camera Transformations
-        // 
-
-        // =============================
         // Create Transformations
         // 
 
@@ -351,7 +355,7 @@ int main() {
 
         // Projection Matrix
         glm::mat4 projectionMatrix;
-        projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(WIN_WIDTH) / static_cast<float>(WIN_HEIGHT), 0.1f, 100.0f);
+        projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(currentWinWidth) / static_cast<float>(currentWinHeight), 0.1f, 100.0f);
 
         // Send matrices to the default shader
 
