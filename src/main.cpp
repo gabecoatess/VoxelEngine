@@ -103,23 +103,23 @@ int main() {
          0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
          0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
 
-        // Left face
-        -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         // Left face
+         -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
 
-        // Top face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+         // Top face
+          0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         -0.5f,  0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+          0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
 
-        // Bottom face
-         0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
+         // Bottom face
+          0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+          0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -157,7 +157,7 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
+
     // Load the texture data
     int textureWidth;
     int textureHeight;
@@ -165,7 +165,7 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
 
     std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/test_texture.png";
-    unsigned char* data = stbi_load(imagePath.c_str(), & textureWidth, & textureHeight, & numOfColorChannels, 0);
+    unsigned char* data = stbi_load(imagePath.c_str(), &textureWidth, &textureHeight, &numOfColorChannels, 0);
 
     if (data)
     {
@@ -211,13 +211,24 @@ int main() {
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
+
     Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
 
     glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
+
+    // ===========================
+    // Camera Setup
+    //
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::vec3(cameraPos - cameraTarget);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(worldUp, cameraDirection));
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -244,24 +255,26 @@ int main() {
         normalShader.use();
 
         // =============================
+        // Camera Transformations
+        // 
+        // Rotate camera
+        const float radius = 10.0f;
+        float camX = sin(timeValue) * radius;
+        float camZ = cos(timeValue) * radius;
+
+        // =============================
         // Create Transformations
         // 
-        // Model Matrix
-        glm::mat4 modelMatrix = glm::mat4(1.0f);
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 100.0f)), glm::vec3(1.0f, 0.0f, 1.0f));
 
         // View Matrix
         glm::mat4 viewMatrix = glm::mat4(1.0f);
-        viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0));
+        viewMatrix = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         // Projection Matrix
         glm::mat4 projectionMatrix;
         projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // Send matrices to the default shader
-        int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
         int viewLoc = glGetUniformLocation(normalShader.Id, "sViewMatrix");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -282,7 +295,12 @@ int main() {
         // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
 
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        // Model Matrix
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+        int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         // =============================
