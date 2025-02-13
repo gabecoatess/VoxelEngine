@@ -28,7 +28,7 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 float lastX = 800.0f * 0.5f;
 float lastY = 600.0f * 0.5f;
-float fieldOfView = 45.0f;
+float fieldOfView = 90.0f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
