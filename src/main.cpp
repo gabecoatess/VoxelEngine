@@ -219,8 +219,8 @@ int main() {
 
     unsigned int indices[] = {
         // Front face
-        0,  1,  2,
-        0,  2,  3,
+        2,  1,  0,
+        3,  2,  0,
 
         // Back face
         4,  5,  6,
@@ -231,16 +231,16 @@ int main() {
         8,  10, 11,
 
         // Left face
-        12, 13, 14,
-        12, 14, 15,
+        14, 13, 12,
+        15, 14, 12,
 
         // Top face
-        16, 17, 18,
+        18, 17, 16,
         17, 18, 19,
 
         // Bottom face
         20, 21, 22,
-        21, 22, 23
+        23, 22, 21
     };
 
     // Triangle Texture Object
@@ -313,6 +313,9 @@ int main() {
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
+
+    // Enable face culling
+    glEnable(GL_CULL_FACE);
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -380,8 +383,8 @@ int main() {
 
         // Model Matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(sineValue * 5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(timeValue * 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        //modelMatrix = glm::rotate(modelMatrix, glm::radians(sineValue * 5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        //modelMatrix = glm::rotate(modelMatrix, glm::radians(timeValue * 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
         int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
