@@ -84,42 +84,42 @@ int main() {
 
     // Triangle data
     float cubeVertices[] = {
-        // POSITIONS            // COLORS           // TEXCOORDS
-        // Front face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+        // FRONT FACE (normal:  0,  0,  1)
+        // Positions           // Colors           // TexCoords  // Normals
+         0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,0.0f,1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    1.0f,0.0f,   0.0f,0.0f,1.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f,0.0f,1.0f,    0.0f,0.0f,   0.0f,0.0f,1.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,0.0f,1.0f,
 
-        // Back face
-         0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+        // BACK FACE (normal: 0,  0, -1)
+         0.5f,  0.5f, -0.5f,    1.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,0.0f,-1.0f,
+         0.5f, -0.5f, -0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,   0.0f,0.0f,-1.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,   0.0f,0.0f,-1.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,0.0f,-1.0f,
 
-        // Right face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+        // RIGHT FACE (normal: 1,  0, 0)
+         0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   1.0f,0.0f,0.0f,
+         0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    1.0f,0.0f,   1.0f,0.0f,0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    0.0f,0.0f,   1.0f,0.0f,0.0f,
+         0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   1.0f,0.0f,0.0f,
 
-        // Left face
-        -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         // LEFT FACE (normal: -1,  0, 0)
+         -0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    0.0f,1.0f,  -1.0f,0.0f,0.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,  -1.0f,0.0f,0.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,  -1.0f,0.0f,0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    1.0f,1.0f,  -1.0f,0.0f,0.0f,
 
-        // Top face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+         // TOP FACE (normal: 0,  1, 0)
+          0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,1.0f,0.0f,
+         -0.5f,  0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,1.0f,   0.0f,1.0f,0.0f,
+          0.5f,  0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,   0.0f,1.0f,0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,0.0f,   0.0f,1.0f,0.0f,
 
-        // Bottom face
-         0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
+         // BOTTOM FACE (normal: 0, -1, 0)
+          0.5f, -0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,0.0f,   0.0f,-1.0f,0.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,   0.0f,-1.0f,0.0f,
+          0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,1.0f,   0.0f,-1.0f,0.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,-1.0f,0.0f
     };
 
     unsigned int indices[] = {
@@ -194,17 +194,21 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    // Update position attribute (layout location = 0)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+    // Update color attribute (layout location = 1)
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Texture coordinate attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+    // Update texture coordinate attribute (layout location = 2)
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    // Update normal attribute (layout location = 3)
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
     // Generate EBO to go into VAO
     unsigned int EBO;
@@ -248,8 +252,9 @@ int main() {
         // 
         // Model Matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 100.0f)), glm::vec3(1.0f, 0.0f, 1.0f));
+        //modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 75.0f)), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f + (sineValue / 250.0f), 0.0f));
 
         // View Matrix
         glm::mat4 viewMatrix = glm::mat4(1.0f);
@@ -274,7 +279,6 @@ int main() {
         //
         // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
-
 
         // =============================
         // Draw the objects
