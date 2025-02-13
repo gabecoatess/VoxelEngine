@@ -11,6 +11,10 @@
 #include <iostream>
 #include <filesystem>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class Shader
 {
 public:
@@ -31,6 +35,8 @@ public:
 
 	void setVec4i(const std::string& name, int x, int y, int z, int w) const;
 	void setVec4f(const std::string& name, float x, float y, float z, float w) const;
+
+	void Shader::setMat4(const std::string& name, const glm::mat4& matrix) const
 };
 
 #endif
