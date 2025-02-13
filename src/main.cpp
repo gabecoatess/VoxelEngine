@@ -47,6 +47,28 @@ void processInput(GLFWwindow* window)
     fKeyPressed = isFPressed;
 }
 
+int currentColor = 0;
+glm::vec3 switchScreenColor()
+{
+    glm::vec3 totalColors[] = {
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(1.0f, 0.6f, 0.6f),
+        glm::vec3(0.6f, 1.0f, 0.6f),
+        glm::vec3(0.6f, 0.6f, 1.0f)
+    };
+    int totalColorsArraySize = sizeof(totalColors) / sizeof(glm::vec3);
+
+    currentColor++;
+    if (currentColor >= totalColorsArraySize)
+    {
+        currentColor = 0;
+    }
+
+    return totalColors[currentColor];
+}
+
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
@@ -84,42 +106,42 @@ int main() {
 
     // Triangle data
     float cubeVertices[] = {
-        // FRONT FACE (normal:  0,  0,  1)
-        // Positions           // Colors           // TexCoords  // Normals
-         0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,0.0f,1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    1.0f,0.0f,   0.0f,0.0f,1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,0.0f,1.0f,    0.0f,0.0f,   0.0f,0.0f,1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,0.0f,1.0f,
+        // POSITIONS            // COLORS           // TEXCOORDS
+        // Front face
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
 
-        // BACK FACE (normal: 0,  0, -1)
-         0.5f,  0.5f, -0.5f,    1.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,0.0f,-1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,   0.0f,0.0f,-1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,   0.0f,0.0f,-1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,0.0f,-1.0f,
+        // Back face
+         0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
 
-        // RIGHT FACE (normal: 1,  0, 0)
-         0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   1.0f,0.0f,0.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    1.0f,0.0f,   1.0f,0.0f,0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    0.0f,0.0f,   1.0f,0.0f,0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   1.0f,0.0f,0.0f,
+        // Right face
+         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
 
-         // LEFT FACE (normal: -1,  0, 0)
-         -0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    0.0f,1.0f,  -1.0f,0.0f,0.0f,
-         -0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,  -1.0f,0.0f,0.0f,
-         -0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,  -1.0f,0.0f,0.0f,
-         -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    1.0f,1.0f,  -1.0f,0.0f,0.0f,
+         // Left face
+         -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
 
-         // TOP FACE (normal: 0,  1, 0)
-          0.5f,  0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,1.0f,   0.0f,1.0f,0.0f,
-         -0.5f,  0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,1.0f,   0.0f,1.0f,0.0f,
-          0.5f,  0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,0.0f,   0.0f,1.0f,0.0f,
-         -0.5f,  0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,0.0f,   0.0f,1.0f,0.0f,
+         // Top face
+          0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+         -0.5f,  0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+          0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
 
-         // BOTTOM FACE (normal: 0, -1, 0)
-          0.5f, -0.5f,  0.5f,    1.0f,0.0f,0.0f,    1.0f,0.0f,   0.0f,-1.0f,0.0f,
-         -0.5f, -0.5f,  0.5f,    0.0f,1.0f,0.0f,    0.0f,0.0f,   0.0f,-1.0f,0.0f,
-          0.5f, -0.5f, -0.5f,    0.0f,0.0f,1.0f,    1.0f,1.0f,   0.0f,-1.0f,0.0f,
-         -0.5f, -0.5f, -0.5f,    0.0f,0.0f,0.0f,    0.0f,1.0f,   0.0f,-1.0f,0.0f
+         // Bottom face
+          0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+          0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -157,15 +179,15 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    
+
     // Load the texture data
     int textureWidth;
     int textureHeight;
     int numOfColorChannels;
     stbi_set_flip_vertically_on_load(true);
 
-    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/gabe_texture.png";
-    unsigned char* data = stbi_load(imagePath.c_str(), & textureWidth, & textureHeight, & numOfColorChannels, 0);
+    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/test_texture.png";
+    unsigned char* data = stbi_load(imagePath.c_str(), &textureWidth, &textureHeight, &numOfColorChannels, 0);
 
     if (data)
     {
@@ -194,28 +216,24 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-    // Update position attribute (layout location = 0)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Update color attribute (layout location = 1)
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Update texture coordinate attribute (layout location = 2)
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    // Texture coordinate attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
-    // Update normal attribute (layout location = 3)
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-    glEnableVertexAttribArray(3);
 
     // Generate EBO to go into VAO
     unsigned int EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
+
     Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
 
     glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
@@ -223,51 +241,76 @@ int main() {
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
 
-    // Multi-cubes
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    // ===========================
+    // Camera Setup
+    //
+    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    float cubeRotations[] = {
-        2,
-        6,
-        4,
-        4,
-        1,
-        6,
-        8,
-        22,
-        53,
-        100,
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::vec3(cameraPos - cameraTarget);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(worldUp, cameraDirection));
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+    // =============================
+    // Scene Setup
+    const float cubePositionConstant = 3;
+    const glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(-cubePositionConstant, 0.0f, 0.0f),
+        glm::vec3(-cubePositionConstant, 0.0f, -cubePositionConstant),
+        glm::vec3(0.0f, 0.0f, -cubePositionConstant),
+        glm::vec3(cubePositionConstant, 0.0f, 0.0f),
+        glm::vec3(cubePositionConstant, 0.0f, cubePositionConstant),
+        glm::vec3(0.0f, 0.0f, cubePositionConstant),
+        glm::vec3(-cubePositionConstant, 0.0f, cubePositionConstant),
+        glm::vec3(cubePositionConstant, 0.0f, -cubePositionConstant)
     };
-    
+    const int cubePositionsArrayLength = sizeof(cubePositions) / sizeof(glm::vec3) - 1;
+
+    float timer = 0.0f;
+    glm::vec3 currentScreenColor = switchScreenColor();
+
     // Main loop
+    double lastTime = 0.0;
     while (!glfwWindowShouldClose(window)) {
+        // =============================
+        // Calculate Delta Time
+        // 
+        double currentTime = glfwGetTime();
+        double deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
         // =============================
         // Input
         //
         processInput(window);
 
         // =============================
+        // Screen Color Timer
+        //
+        timer += deltaTime;
+
+        std::cout << timer << '\n';
+
+        if (timer >= 1.0f)
+        {
+            timer = 0.0f;
+            currentScreenColor = switchScreenColor();
+        }
+
+        // =============================
         // Render
         //
-        glClearColor(7.0f, 0.6f, 0.6f, 0.0f);
+        glClearColor(currentScreenColor.x, currentScreenColor.y, currentScreenColor.z, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // =============================
-        // Collect time
+        // Collect Sine
         //
-        float timeValue = glfwGetTime();
-        float sineValue = sin(timeValue) * 100.0f;
+        float sineValue = sin(currentTime) * 100.0f;
+
+        //std::cout << "Delta Time: " << deltaTime << '\n';
 
         // =============================
         // Active Default Shader
@@ -275,29 +318,27 @@ int main() {
         normalShader.use();
 
         // =============================
+        // Camera Transformations
+        // 
+        // Rotate camera
+        const float radius = 10.0f;
+        float camX = sin(currentTime) * radius;
+        float camZ = cos(currentTime) * radius;
+
+        // =============================
         // Create Transformations
         // 
-        // Model Matrix
-        /*
-        glm::mat4 modelMatrix = glm::mat4(1.0f);
-        //modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 75.0f)), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f + (sineValue / 250.0f), 0.0f));
-        */
+
 
         // View Matrix
         glm::mat4 viewMatrix = glm::mat4(1.0f);
-        viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -3.0));
+        viewMatrix = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         // Projection Matrix
         glm::mat4 projectionMatrix;
         projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // Send matrices to the default shader
-        /*
-        int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        */
 
         int viewLoc = glGetUniformLocation(normalShader.Id, "sViewMatrix");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -311,26 +352,27 @@ int main() {
         // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
 
+
         // =============================
         // Draw the objects
         // 
         // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
 
-        for (unsigned int i = 0; i < 10; i++)
+        for (int i = 0; i <= cubePositionsArrayLength; i++)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians((timeValue * 75.0f) * cubeRotations[i]), glm::vec3(1.0f, 1.0f, 1.0f));
-            model = glm::translate(model, glm::vec3((sineValue / 250.0f), 0.0f + (sineValue / 250.0f), 0.0f));
+            // Model Matrix
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-            normalShader.setMat4("sModelMatrix", model);
+            modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(1.0f, 0.0f, 0.0f));
+            //modelMatrix = glm::rotate(modelMatrix, glm::radians(static_cast<float>(currentTime) * 100.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 
+            int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+            //glDrawArrays(GL_TRIANGLES, 0, 3);
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         }
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         // =============================
         // Finish rendering
