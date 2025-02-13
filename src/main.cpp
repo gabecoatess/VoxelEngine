@@ -16,6 +16,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 int currentDrawMode = 0;
+bool fKeyPressed = false;
 void switchDrawMode()
 {
     if (currentDrawMode == 0)
@@ -37,10 +38,13 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    bool isFPressed = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+    if (isFPressed && !fKeyPressed)
     {
         switchDrawMode();
     }
+
+    fKeyPressed = isFPressed;
 }
 
 int main() {
