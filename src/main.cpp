@@ -163,6 +163,9 @@ int main() {
 
     glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
     
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         // =============================
@@ -174,7 +177,7 @@ int main() {
         // Render
         //
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // =============================
         // Collect time
