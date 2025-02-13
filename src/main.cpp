@@ -10,6 +10,26 @@
 #include "utilities/Shader.h"
 #include "thirdparty/stb_image.h"
 
+// ===========================
+// Time Setup
+//
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+// ===========================
+// Camera Setup
+//
+glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+bool firstMouse = true;
+float yaw = -90.0f;
+float pitch = 0.0f;
+float lastX = 800.0f * 0.5f;
+float lastY = 600.0f * 0.5f;
+float fieldOfView = 45.0f;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -31,8 +51,73 @@ void switchDrawMode()
     }
 }
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
 void processInput(GLFWwindow* window)
 {
+    const float cameraSpeed = 2.0f;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        cameraPosition += cameraSpeed * cameraFront * deltaTime;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        cameraPosition -= cameraSpeed * cameraFront * deltaTime;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        cameraPosition += cameraSpeed * cameraUp * deltaTime;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        cameraPosition -= cameraSpeed * cameraUp * deltaTime;
+    }
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
@@ -61,7 +146,7 @@ int main() {
 
     // Create a window with OpenGL context
     const int WIN_WIDTH = 1280;
-    const int WIN_HEIGHT = 720;
+    const int WIN_HEIGHT = 1280;
     GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "GLFW Test Window", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -81,6 +166,8 @@ int main() {
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Triangle data
     float cubeVertices[] = {
@@ -218,20 +305,16 @@ int main() {
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
-
-    // ===========================
-    // Camera Setup
-    //
-    glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::vec3(cameraPos - cameraTarget);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(worldUp, cameraDirection));
-    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+        // =============================
+        // Calculate Delta
+        // 
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // =============================
         // Input
         //
@@ -257,10 +340,6 @@ int main() {
         // =============================
         // Camera Transformations
         // 
-        // Rotate camera
-        const float radius = 10.0f;
-        float camX = sin(timeValue) * radius;
-        float camZ = cos(timeValue) * radius;
 
         // =============================
         // Create Transformations
@@ -268,11 +347,11 @@ int main() {
 
         // View Matrix
         glm::mat4 viewMatrix = glm::mat4(1.0f);
-        viewMatrix = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
         // Projection Matrix
         glm::mat4 projectionMatrix;
-        projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(WIN_WIDTH) / static_cast<float>(WIN_HEIGHT), 0.1f, 100.0f);
 
         // Send matrices to the default shader
 
@@ -297,6 +376,8 @@ int main() {
 
         // Model Matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(sineValue * 5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(timeValue * 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
         int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
