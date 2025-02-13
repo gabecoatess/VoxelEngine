@@ -164,7 +164,7 @@ int main() {
     int numOfColorChannels;
     stbi_set_flip_vertically_on_load(true);
 
-    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/test_texture.png";
+    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/gabe_texture.png";
     unsigned char* data = stbi_load(imagePath.c_str(), & textureWidth, & textureHeight, & numOfColorChannels, 0);
 
     if (data)
@@ -222,6 +222,33 @@ int main() {
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
+
+    // Multi-cubes
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    float cubeRotations[] = {
+        2,
+        6,
+        4,
+        4,
+        1,
+        6,
+        8,
+        22,
+        53,
+        100,
+    };
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -233,7 +260,7 @@ int main() {
         // =============================
         // Render
         //
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClearColor(7.0f, 0.6f, 0.6f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // =============================
@@ -251,10 +278,12 @@ int main() {
         // Create Transformations
         // 
         // Model Matrix
+        /*
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         //modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + sineValue), glm::vec3(0.0f, 1.0f, 0.0f));
         modelMatrix = glm::rotate(modelMatrix, glm::radians(-55.0f + (timeValue * 75.0f)), glm::vec3(0.0f, 1.0f, 0.0f));
         modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f + (sineValue / 250.0f), 0.0f));
+        */
 
         // View Matrix
         glm::mat4 viewMatrix = glm::mat4(1.0f);
@@ -265,8 +294,10 @@ int main() {
         projectionMatrix = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // Send matrices to the default shader
+        /*
         int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        */
 
         int viewLoc = glGetUniformLocation(normalShader.Id, "sViewMatrix");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -286,6 +317,18 @@ int main() {
         // Bind the first bottom left triangle and draw it
         glBindVertexArray(VAO);
 
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians((timeValue * 75.0f) * cubeRotations[i]), glm::vec3(1.0f, 1.0f, 1.0f));
+            model = glm::translate(model, glm::vec3((sineValue / 250.0f), 0.0f + (sineValue / 250.0f), 0.0f));
+
+            normalShader.setMat4("sModelMatrix", model);
+
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        }
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
