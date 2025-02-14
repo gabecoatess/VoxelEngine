@@ -15,32 +15,18 @@
 #include "objects/Camera.h"
 #include "thirdparty/stb_image.h"
 
-// ===========================
-// Window Settings
-//
 const int WIN_WIDTH = 1600;
 const int WIN_HEIGHT = 900;
 int currentWinWidth = WIN_WIDTH;
 int currentWinHeight = WIN_HEIGHT;
 
-// ===========================
-// Service Setup
-//
 TimeUtility& timeUtility = TimeUtility::GetInstance();
 
-// ===========================
-// Object Setup
-//
 Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = WIN_WIDTH * 0.5f;
 float lastY = WIN_HEIGHT * 0.5f;
 bool firstMouse = true;
 
-Camera cam2(glm::vec3(0.0f, 0.0f, 3.0f));
-
-// ===========================
-// Callbacks
-//
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
@@ -61,7 +47,6 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     Renderer::GetCurrentCamera().ProcessMouseMovement(xoffset, yoffset);
 }
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     currentWinWidth = width;
@@ -69,15 +54,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 }
-
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
 {
     Renderer::GetCurrentCamera().ProcessMouseScroll(static_cast<float>(yOffset));
 }
 
-// ===========================
-// Input
-//
 int currentDrawMode = 0;
 bool fKeyPressed = false;
 void switchDrawMode()
@@ -93,7 +74,6 @@ void switchDrawMode()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
-
 void processInput(GLFWwindow* window)
 {
 	Camera& camera = Renderer::GetCurrentCamera();
@@ -163,9 +143,6 @@ void processInput(GLFWwindow* window)
     }
 }
 
-// ===========================
-// Main Game Startup
-//
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
@@ -244,7 +221,6 @@ int main() {
           0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
          -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
     };
-
     const std::vector<unsigned int> cubeIndices = {
         // Front face
         2,  1,  0,
@@ -271,9 +247,6 @@ int main() {
         23, 22, 21
     };
 
-    Mesh cubeMesh(cubeVertices, cubeIndices);
-    Mesh cubeMesh2(cubeVertices, cubeIndices);
-
     // Triangle Texture Object
     unsigned int texture;
     glGenTextures(1, &texture);
@@ -296,7 +269,6 @@ int main() {
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        //glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
@@ -306,68 +278,34 @@ int main() {
     // Free memory 
     stbi_image_free(data);
 
-    // =============================
-    // Shader
-    // 
     Shader* defaultShader = ResourceManager::LoadShader("default_vertex.glsl", "default_fragment.glsl", "default");
 
-    // =============================
-    // Cameras
-    // 
     cam.Initialize();
-    cam2.Initialize();
 
-    // =============================
-    // Renderer
-    // 
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
+    Mesh cubeMesh(cubeVertices, cubeIndices);
+    Mesh cubeMesh2(cubeVertices, cubeIndices);
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        timeUtility.Update();
-
-        // =============================
-        // Input
-        //
         processInput(window);
 
-        // =============================
-        // Render
-        //
+        timeUtility.Update();
+
         Renderer::ClearScreen(glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
 
-        // =============================
-        // Collect time
-        //
         float timeValue = glfwGetTime();
         float sineValue = sin(timeValue) * 100.0f;
 
-        // =============================
-        // Setup Model Textures
-        //
-        // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
-
-        // =============================
-        // Setup Model
-        // 
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         Renderer::DrawMesh(cubeMesh, *defaultShader, modelMatrix);
 
-        glm::mat4 modelMatrix2 = glm::mat4(1.0f);
-        modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(0.0f, 2.0f, -3.0f));
-        Renderer::DrawMesh(cubeMesh2, *defaultShader, modelMatrix2);
-
         // =============================
         // Finish rendering
-        // 
-        // Swap the front buffer and back buffer
         glfwSwapBuffers(window);
-
-        // =============================
-        // Check for any events
-        //
         glfwPollEvents();
     }
 
