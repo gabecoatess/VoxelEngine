@@ -25,7 +25,7 @@ add_library(glad
 	src/thirdparty/stb_image.cpp
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
-)
+ "src/objects/Camera.cpp")
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 target_link_libraries(glad PUBLIC common_includes)
 
@@ -38,5 +38,5 @@ add_executable(VoxelEngine
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
 	src/thirdparty/stb_image.cpp
-)
+ "src/objects/Camera.cpp")
 target_link_libraries(VoxelEngine PRIVATE common_includes glfw glad OpenGL::GL)

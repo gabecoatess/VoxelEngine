@@ -9,23 +9,8 @@
 
 #include "utilities/TimeUtility.h"
 #include "utilities/Shader.h"
+#include "objects/Camera.h"
 #include "thirdparty/stb_image.h"
-
-TimeUtility& timeUtility = TimeUtility::GetInstance();
-
-// ===========================
-// Camera Setup
-//
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-bool firstMouse = true;
-float yaw = -90.0f;
-float pitch = 0.0f;
-float lastX = 800.0f * 0.5f;
-float lastY = 600.0f * 0.5f;
-float fieldOfView = 90.0f;
 
 // ===========================
 // Window Settings
@@ -35,6 +20,43 @@ const int WIN_HEIGHT = 1280;
 int currentWinWidth = WIN_WIDTH;
 int currentWinHeight = WIN_HEIGHT;
 
+// ===========================
+// Service Setup
+//
+TimeUtility& timeUtility = TimeUtility::GetInstance();
+
+// ===========================
+// Object Setup
+//
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = WIN_WIDTH * 0.5f;
+float lastY = WIN_HEIGHT * 0.5f;
+bool firstMouse = true;
+
+// ===========================
+// Callbacks
+//
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     currentWinWidth = width;
@@ -42,6 +64,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, currentWinWidth, currentWinHeight);
 }
 
+void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yOffset));
+}
+
+// ===========================
+// Input
+//
 int currentDrawMode = 0;
 bool fKeyPressed = false;
 void switchDrawMode()
@@ -58,78 +88,40 @@ void switchDrawMode()
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
-}
-
 void processInput(GLFWwindow* window)
 {
-    const float cameraSpeed = 2.0f;
-
+    // Movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cameraPosition += cameraSpeed * cameraFront * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(FORWARD, timeUtility.GetDeltaTime());
     }
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cameraPosition -= cameraSpeed * cameraFront * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(BACKWARD, timeUtility.GetDeltaTime());
     }
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(LEFT, timeUtility.GetDeltaTime());
     }
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(RIGHT, timeUtility.GetDeltaTime());
     }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
     {
-        cameraPosition += cameraSpeed * cameraUp * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(UP, timeUtility.GetDeltaTime());
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
-        cameraPosition -= cameraSpeed * cameraUp * timeUtility.GetDeltaTime();
+        camera.ProcessKeyboard(DOWN, timeUtility.GetDeltaTime());
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-
+    // Toggling Wireframe
     bool isFPressed = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
     if (isFPressed && !fKeyPressed)
     {
@@ -137,8 +129,17 @@ void processInput(GLFWwindow* window)
     }
 
     fKeyPressed = isFPressed;
+
+    // Exitting Application
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
 
+// ===========================
+// Main Game Startup
+//
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
@@ -347,28 +348,19 @@ int main() {
         // Create Transformations
         // 
 
-        // View Matrix
-        glm::mat4 viewMatrix = glm::mat4(1.0f);
-        viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-
         // Projection Matrix
-        glm::mat4 projectionMatrix;
-        projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(currentWinWidth) / static_cast<float>(currentWinHeight), 0.1f, 100.0f);
+        glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(currentWinWidth) / static_cast<float>(currentWinHeight), 0.1f, 100.0f);
+        normalShader.setMat4("sProjectionMatrix", projectionMatrix);
 
-        // Send matrices to the default shader
-
-        int viewLoc = glGetUniformLocation(normalShader.Id, "sViewMatrix");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-        int projectionLoc = glGetUniformLocation(normalShader.Id, "sProjectionMatrix");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+        // View Matrix
+        glm::mat4 viewMatrix = camera.GetViewMatrix();
+        normalShader.setMat4("sViewMatrix", viewMatrix);
 
         // =============================
         // Setup Model Textures
         //
         // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
-
 
         // =============================
         // Draw the objects
@@ -378,11 +370,7 @@ int main() {
 
         // Model Matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        //modelMatrix = glm::rotate(modelMatrix, glm::radians(sineValue * 5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        //modelMatrix = glm::rotate(modelMatrix, glm::radians(timeValue * 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        int modelLoc = glGetUniformLocation(normalShader.Id, "sModelMatrix");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        normalShader.setMat4("sModelMatrix", modelMatrix);
 
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
