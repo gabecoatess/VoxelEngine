@@ -7,6 +7,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#include "utilities/ResourceManager.h"
+#include "utilities/Mesh.h"
+#include "utilities/Renderer.h"
 #include "utilities/TimeUtility.h"
 #include "utilities/Shader.h"
 #include "objects/Camera.h"
@@ -15,8 +18,8 @@
 // ===========================
 // Window Settings
 //
-const int WIN_WIDTH = 1280;
-const int WIN_HEIGHT = 1280;
+const int WIN_WIDTH = 1600;
+const int WIN_HEIGHT = 900;
 int currentWinWidth = WIN_WIDTH;
 int currentWinHeight = WIN_HEIGHT;
 
@@ -28,10 +31,12 @@ TimeUtility& timeUtility = TimeUtility::GetInstance();
 // ===========================
 // Object Setup
 //
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = WIN_WIDTH * 0.5f;
 float lastY = WIN_HEIGHT * 0.5f;
 bool firstMouse = true;
+
+Camera cam2(glm::vec3(0.0f, 0.0f, 3.0f));
 
 // ===========================
 // Callbacks
@@ -54,19 +59,20 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    Renderer::GetCurrentCamera().ProcessMouseMovement(xoffset, yoffset);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     currentWinWidth = width;
     currentWinHeight = height;
-    glViewport(0, 0, currentWinWidth, currentWinHeight);
+    Renderer::SetViewport(currentWinWidth, currentWinHeight);
+	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yOffset));
+    Renderer::GetCurrentCamera().ProcessMouseScroll(static_cast<float>(yOffset));
 }
 
 // ===========================
@@ -90,6 +96,7 @@ void switchDrawMode()
 
 void processInput(GLFWwindow* window)
 {
+	Camera& camera = Renderer::GetCurrentCamera();
     // Movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
@@ -119,6 +126,25 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
         camera.ProcessKeyboard(DOWN, timeUtility.GetDeltaTime());
+    }
+
+    // Switch Primary Camera
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        // Check if current camera is first camera
+        if (&Renderer::GetCurrentCamera() != &cam)
+        {
+            Renderer::SetCurrentCamera(cam);
+        }
+    }
+    
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        // Check if current camera is second camera
+        if (&Renderer::GetCurrentCamera() != &cam2)
+        {
+            Renderer::SetCurrentCamera(cam2);
+        }
     }
 
     // Toggling Wireframe
@@ -176,10 +202,11 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Initialize Utilities
+    Renderer::Initialize(cam);
     timeUtility.Initialize();
 
     // Triangle data
-    float cubeVertices[] = {
+    const std::vector<float> cubeVertices = {
         // POSITIONS            // COLORS           // TEXCOORDS
         // Front face
          0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
@@ -218,7 +245,7 @@ int main() {
          -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
     };
 
-    unsigned int indices[] = {
+    const std::vector<unsigned int> cubeIndices = {
         // Front face
         2,  1,  0,
         3,  2,  0,
@@ -243,6 +270,9 @@ int main() {
         20, 21, 22,
         23, 22, 21
     };
+
+    Mesh cubeMesh(cubeVertices, cubeIndices);
+    Mesh cubeMesh2(cubeVertices, cubeIndices);
 
     // Triangle Texture Object
     unsigned int texture;
@@ -276,48 +306,23 @@ int main() {
     // Free memory 
     stbi_image_free(data);
 
-    // ==================================
-    // Triangle ONE
-    // ==================================
-    // Generate VAO
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    // =============================
+    // Shader
+    // 
+    Shader* defaultShader = ResourceManager::LoadShader("default_vertex.glsl", "default_fragment.glsl", "default");
 
-    // Generate VBO to go into VAO
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+    // =============================
+    // Cameras
+    // 
+    cam.Initialize();
+    cam2.Initialize();
 
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
+    // =============================
+    // Renderer
+    // 
+    Renderer::SetViewport(currentWinWidth, currentWinHeight);
+	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
-    // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Texture coordinate attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    // Generate EBO to go into VAO
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    Shader normalShader("default_vertex.glsl", "default_fragment.glsl");
-
-    glViewport(0, 0, currentWinWidth, currentWinHeight);
-
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-
-    // Enable face culling
-    glEnable(GL_CULL_FACE);
-    
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         timeUtility.Update();
@@ -330,8 +335,7 @@ int main() {
         // =============================
         // Render
         //
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Renderer::ClearScreen(glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
 
         // =============================
         // Collect time
@@ -340,39 +344,20 @@ int main() {
         float sineValue = sin(timeValue) * 100.0f;
 
         // =============================
-        // Active Default Shader
-        //
-        normalShader.use();
-
-        // =============================
-        // Create Transformations
-        // 
-
-        // Projection Matrix
-        glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(currentWinWidth) / static_cast<float>(currentWinHeight), 0.1f, 100.0f);
-        normalShader.setMat4("sProjectionMatrix", projectionMatrix);
-
-        // View Matrix
-        glm::mat4 viewMatrix = camera.GetViewMatrix();
-        normalShader.setMat4("sViewMatrix", viewMatrix);
-
-        // =============================
         // Setup Model Textures
         //
         // Bind the texture
         glBindTexture(GL_TEXTURE_2D, texture);
 
         // =============================
-        // Draw the objects
+        // Setup Model
         // 
-        // Bind the first bottom left triangle and draw it
-        glBindVertexArray(VAO);
-
-        // Model Matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        normalShader.setMat4("sModelMatrix", modelMatrix);
+        Renderer::DrawMesh(cubeMesh, *defaultShader, modelMatrix);
 
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glm::mat4 modelMatrix2 = glm::mat4(1.0f);
+        modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(0.0f, 2.0f, -3.0f));
+        Renderer::DrawMesh(cubeMesh2, *defaultShader, modelMatrix2);
 
         // =============================
         // Finish rendering

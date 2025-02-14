@@ -1,39 +1,70 @@
 // Camera.cpp
 
 #include "Camera.h"
+#include "../utilities/Renderer.h"
 #include <cmath>
 
-Camera::Camera(glm::vec3 _position, glm::vec3 _up, float _yaw, float _pitch)
-	: front(glm::vec3(0.0f, 0.0f, -1.0f)),
-	movementSpeed(SPEED),
-	mouseSensitivity(SENSITIVITY),
-	fieldOfView(FIELD_OF_VIEW)
+Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch, float aspectRatio, float nearPlane, float farPlane)
+	: position(position)
+	, worldUp(up)
+	, yaw(yaw)
+	, pitch(pitch)
+	, front(glm::vec3(0.0f, 0.0f, -1.0f))
+	, movementSpeed(SPEED)
+	, mouseSensitivity(SENSITIVITY)
+	, fieldOfView(FIELD_OF_VIEW)
+	, aspectRatio(aspectRatio)
+	, nearPlane(nearPlane)
+	, farPlane(farPlane)
 {
-	position = _position;
-	worldUp = _up;
-	yaw = _yaw;
-	pitch = _pitch;
-
+	Renderer::AddCamera(*this);
 	UpdateCameraVectors();
 }
 
-Camera::Camera(float _posX, float _posY, float _posZ, float _upX, float _upY, float _upZ, float _yaw, float _pitch)
-	: front(glm::vec3(0.0f, 0.0f, -1.0f)),
-	movementSpeed(SPEED),
-	mouseSensitivity(SENSITIVITY),
-	fieldOfView(FIELD_OF_VIEW)
+Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, float aspectRatio, float nearPlane, float farPlane)
+	: Camera(glm::vec3(posX, posY, posZ), glm::vec3(upX, upY, upZ), yaw, pitch, aspectRatio, nearPlane, farPlane)
 {
-	position = glm::vec3(_posX, _posY, _posZ);
-	worldUp = glm::vec3(_upX, _upY, _upZ);
-	yaw = _yaw;
-	pitch = _pitch;
+}
 
-	UpdateCameraVectors();
+void Camera::Initialize()
+{
+	Renderer::AddCamera(*this);
 }
 
 glm::mat4 Camera::GetViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
+}
+
+glm::mat4 Camera::GetProjectionMatrix()
+{
+	return glm::perspective(glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
+}
+
+void Camera::SetAspectRatio(float width, float height)
+{
+	aspectRatio = width / height;
+}
+
+void Camera::SetFieldOfView(float fov)
+{
+	fieldOfView = fov;
+}
+
+void Camera::SetClipPlanes(float near, float far)
+{
+	nearPlane = near;
+	farPlane = far;
+}
+
+void Camera::SetNearPlane(float near)
+{
+	nearPlane = near;
+}
+
+void Camera::SetFarPlane(float far)
+{
+	farPlane = far;
 }
 
 void Camera::ProcessKeyboard(Camera_Movement _direction, float _deltaTime)

@@ -23,9 +23,13 @@ add_subdirectory(external/glfw)
 add_library(glad
 	external/glad/src/glad.c
 	src/thirdparty/stb_image.cpp
+	src/utilities/Renderer.cpp
+	src/utilities/Mesh.cpp
+	src/utilities/ResourceManager.cpp
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
- "src/objects/Camera.cpp")
+	src/objects/Camera.cpp
+)
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 target_link_libraries(glad PUBLIC common_includes)
 
@@ -35,8 +39,12 @@ find_package(OpenGL REQUIRED)
 # Executable
 add_executable(VoxelEngine
 	src/main.cpp
+	src/utilities/Renderer.cpp
+	src/utilities/Mesh.cpp
+	src/utilities/ResourceManager.cpp
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
 	src/thirdparty/stb_image.cpp
- "src/objects/Camera.cpp")
+	src/objects/Camera.cpp
+)
 target_link_libraries(VoxelEngine PRIVATE common_includes glfw glad OpenGL::GL)
