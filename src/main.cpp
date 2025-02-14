@@ -7,14 +7,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#include "utilities/TimeUtility.h"
 #include "utilities/Shader.h"
 #include "thirdparty/stb_image.h"
 
-// ===========================
-// Time Setup
-//
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+TimeUtility& timeUtility = TimeUtility::GetInstance();
 
 // ===========================
 // Camera Setup
@@ -100,32 +97,32 @@ void processInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cameraPosition += cameraSpeed * cameraFront * deltaTime;
+        cameraPosition += cameraSpeed * cameraFront * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cameraPosition -= cameraSpeed * cameraFront * deltaTime;
+        cameraPosition -= cameraSpeed * cameraFront * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        cameraPosition -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
+        cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
     {
-        cameraPosition += cameraSpeed * cameraUp * deltaTime;
+        cameraPosition += cameraSpeed * cameraUp * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
-        cameraPosition -= cameraSpeed * cameraUp * deltaTime;
+        cameraPosition -= cameraSpeed * cameraUp * timeUtility.GetDeltaTime();
     }
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -176,6 +173,9 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // Initialize Utilities
+    timeUtility.Initialize();
 
     // Triangle data
     float cubeVertices[] = {
@@ -319,12 +319,7 @@ int main() {
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        // =============================
-        // Calculate Delta
-        // 
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        timeUtility.Update();
 
         // =============================
         // Input
@@ -404,6 +399,7 @@ int main() {
     }
 
     // Cleanup and exit
+    timeUtility.Destroy();
     glfwDestroyWindow(window);
     glfwTerminate();
 

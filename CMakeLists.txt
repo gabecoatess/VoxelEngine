@@ -23,6 +23,7 @@ add_subdirectory(external/glfw)
 add_library(glad
 	external/glad/src/glad.c
 	src/thirdparty/stb_image.cpp
+	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
 )
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
@@ -34,6 +35,7 @@ find_package(OpenGL REQUIRED)
 # Executable
 add_executable(VoxelEngine
 	src/main.cpp
+	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
 	src/thirdparty/stb_image.cpp
 )
