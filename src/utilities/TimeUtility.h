@@ -12,6 +12,7 @@ public:
 
 	void Update();
 
+	int GetFramesPerSecond() const;
 	float GetDeltaTime() const;
 
 	void Destroy();
@@ -23,8 +24,11 @@ private:
 	TimeUtility(const TimeUtility&) = delete;
 	TimeUtility& operator=(const TimeUtility&) = delete;
 
+	int framesPerSecond;
 	float deltaTime;
 	float lastFrameTime;
+	float frameTimer;
+	int frameCount;
 };
 
 #endif
