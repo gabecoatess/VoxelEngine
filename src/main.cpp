@@ -108,25 +108,6 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(DOWN, timeUtility.GetDeltaTime());
     }
 
-    // Switch Primary Camera
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-        // Check if current camera is first camera
-        if (&Renderer::GetCurrentCamera() != &cam)
-        {
-            Renderer::SetCurrentCamera(cam);
-        }
-    }
-    
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    {
-        // Check if current camera is second camera
-        if (&Renderer::GetCurrentCamera() != &cam2)
-        {
-            Renderer::SetCurrentCamera(cam2);
-        }
-    }
-
     // Toggling Wireframe
     bool isFPressed = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
     if (isFPressed && !fKeyPressed)
