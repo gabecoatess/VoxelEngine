@@ -23,6 +23,7 @@ add_subdirectory(external/glfw)
 add_library(glad
 	external/glad/src/glad.c
 	src/thirdparty/stb_image.cpp
+	src/engine/MultiDimArray.cpp
 	src/utilities/Renderer.cpp
 	src/utilities/Mesh.cpp
 	src/utilities/ResourceManager.cpp
@@ -39,6 +40,7 @@ find_package(OpenGL REQUIRED)
 # Executable
 add_executable(VoxelEngine
 	src/main.cpp
+	src/engine/MultiDimArray.cpp
 	src/utilities/Renderer.cpp
 	src/utilities/Mesh.cpp
 	src/utilities/ResourceManager.cpp
