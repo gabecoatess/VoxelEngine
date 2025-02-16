@@ -120,7 +120,7 @@ void processInput(GLFWwindow* window)
 
     fKeyPressed = isFPressed;
 
-    // Exitting Application
+    // Exiting Application
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
