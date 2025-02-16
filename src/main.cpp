@@ -15,8 +15,8 @@
 #include "objects/Camera.h"
 #include "thirdparty/stb_image.h"
 
-const int WIN_WIDTH = 1600;
-const int WIN_HEIGHT = 900;
+const int WIN_WIDTH = 1920;
+const int WIN_HEIGHT = 1080;
 int currentWinWidth = WIN_WIDTH;
 int currentWinHeight = WIN_HEIGHT;
 
