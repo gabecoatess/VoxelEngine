@@ -3,10 +3,7 @@
 #include "Chunk.h"
 
 Chunk::Chunk(const glm::ivec3& gridPosition)
-#include <vector>
-
-Chunk::Chunk()
-	: _data(CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH), _mesh(nullptr)
+	: _data(CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH), _mesh(nullptr), _gridPosition(gridPosition)
 {
 }
 

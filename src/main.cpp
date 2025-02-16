@@ -199,11 +199,31 @@ int main() {
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
-    Chunk myChunk1;
-    myChunk1.GenerateData();
+    // Temporary World Vector
+    int worldSizeX = 16;
+    int worldSizeY = 4;
+    int worldSizeZ = 16;
+    std::vector<std::unique_ptr<Chunk>> world;
 
-    Chunk myChunk2;
-    myChunk2.GenerateData();
+    for (int x = 0; x < worldSizeX; x++)
+    {
+        for (int y = 0; y < worldSizeY; y++)
+        {
+            for (int z = 0; z < worldSizeZ; z++)
+            {
+                world.push_back(std::make_unique<Chunk>(glm::vec3(x, y, z)));
+            }
+        }
+    }
+
+    // Generate World Data
+    for (size_t i = 0; i < world.size(); i++)
+    {
+        world[i]->GenerateData();
+        std::cout << "Generated Chunk [" << i << "]" << std::endl;
+    }
+
+    std::cout << sizeof(world) << std::endl;
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -218,17 +238,9 @@ int main() {
 
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        if (myChunk1.GetMesh())
+        for (size_t i = 0; i < world.size(); i++)
         {
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            Renderer::DrawMesh(*myChunk1.GetMesh(), modelMatrix);
-        }
-
-        if (myChunk1.GetMesh())
-        {
-            glm::mat4 modelMatrix2 = glm::mat4(1.0f);
-            modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(16.2f, 0.0f, 0.0f));
-            Renderer::DrawMesh(*myChunk2.GetMesh(), modelMatrix2);
+            Renderer::DrawMesh(*world[i]->GetMesh(), world[i]->GetModelMatrix());
         }
 
         // =============================
