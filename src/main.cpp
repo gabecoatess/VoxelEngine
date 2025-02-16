@@ -57,7 +57,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     currentWinWidth = width;
     currentWinHeight = height;
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
-	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
+    Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 }
 
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
@@ -83,7 +83,7 @@ void switchDrawMode()
 
 void processInput(GLFWwindow* window)
 {
-	Camera& camera = Renderer::GetCurrentCamera();
+    Camera& camera = Renderer::GetCurrentCamera();
     // Movement
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
@@ -167,6 +167,16 @@ int main() {
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    // Initialize ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     // Initialize Utilities
     Renderer::Initialize(cam);
     timeUtility.Initialize();
@@ -199,13 +209,13 @@ int main() {
         std::cout << "Texture image data did not load successfully: " << imagePath << '\n';
     }
 
-    // Free memory 
+    // Free memory
     stbi_image_free(data);
 
     cam.Initialize();
 
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
-	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
+    Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
     // Temporary World Vector
     int worldSizeX = 16;
@@ -251,11 +261,29 @@ int main() {
             Renderer::DrawMesh(*world[i]->GetMesh(), world[i]->GetModelMatrix());
         }
 
-        // =============================
+        // Start the ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // Create a test window
+        ImGui::Begin("Test Window");
+        ImGui::Text("Hello, ImGui! This is a test window.");
+        ImGui::End();
+
+        // Render ImGui commands
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         // Finish rendering
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    // Cleanup ImGui resources
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     // Cleanup and exit
     timeUtility.Destroy();
