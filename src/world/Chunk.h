@@ -15,7 +15,7 @@ class Chunk
 {
 public:
 	static constexpr size_t CHUNK_WIDTH = 16;
-	static constexpr size_t CHUNK_HEIGHT = 16;
+	static constexpr size_t CHUNK_HEIGHT = 32;
 	static constexpr size_t CHUNK_DEPTH = 16;
 
 	Chunk(const glm::ivec3& gridPosition);
