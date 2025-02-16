@@ -47,6 +47,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     Renderer::GetCurrentCamera().ProcessMouseMovement(xoffset, yoffset);
 }
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     currentWinWidth = width;
@@ -54,6 +55,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 }
+
 void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
 {
     Renderer::GetCurrentCamera().ProcessMouseScroll(static_cast<float>(yOffset));
@@ -74,6 +76,7 @@ void switchDrawMode()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 }
+
 void processInput(GLFWwindow* window)
 {
 	Camera& camera = Renderer::GetCurrentCamera();
