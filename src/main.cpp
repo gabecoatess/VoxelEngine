@@ -244,7 +244,7 @@ int main() {
     int numOfColorChannels;
     stbi_set_flip_vertically_on_load(true);
 
-    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/test_texture.png";
+    std::string imagePath = std::string(PROJECT_ROOT) + "/assets/textures/stone.png";
     unsigned char* data = stbi_load(imagePath.c_str(), &textureWidth, &textureHeight, &numOfColorChannels, 0);
 
     if (data)
