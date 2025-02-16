@@ -2,12 +2,17 @@
 
 #include "Chunk.h"
 
+#include <memory>
 #include <vector>
 
 Chunk::Chunk()
-	: _data(CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH) {
+	: _data(CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH), _mesh(nullptr)
+{
 }
-Chunk::~Chunk() {}
+
+Chunk::~Chunk()
+{
+}
 
 static const int neighborOffsets[6][3] = {
 	{ 0,  0,  1},  // Front
@@ -62,9 +67,12 @@ void Chunk::GenerateData()
 			}
 		}
 	}
+
+	// Update the mesh
+	UpdateMesh();
 }
 
-Mesh Chunk::GenerateMesh() const
+void Chunk::UpdateMesh()
 {
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
@@ -191,7 +199,12 @@ Mesh Chunk::GenerateMesh() const
 		}
 	}
 
-	return Mesh(vertices, indices);
+	_mesh = std::make_unique<Mesh>(vertices, indices);
+}
+
+const Mesh* Chunk::GetMesh() const
+{
+	return _mesh.get();
 }
 
 const MultiDimArray& Chunk::GetData() const

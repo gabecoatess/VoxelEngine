@@ -199,9 +199,11 @@ int main() {
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
-    Chunk myChunk;
-    myChunk.GenerateData();
-    Mesh chunkMesh = myChunk.GenerateMesh();
+    Chunk myChunk1;
+    myChunk1.GenerateData();
+
+    Chunk myChunk2;
+    myChunk2.GenerateData();
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -212,11 +214,22 @@ int main() {
         Renderer::ClearScreen(glm::vec4(127.0f / 255.0f, 205.0f / 255.0f, 254.0f / 255.0f, 1.0f));
 
         float timeValue = glfwGetTime();
-        float sineValue = sin(timeValue) * 100.0f;
+        float sineValue = sin(timeValue);
 
         glBindTexture(GL_TEXTURE_2D, texture);
-        glm::mat4 modelMatrix = glm::mat4(1.0f);
-        Renderer::DrawMesh(chunkMesh, modelMatrix);
+
+        if (myChunk1.GetMesh())
+        {
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            Renderer::DrawMesh(*myChunk1.GetMesh(), modelMatrix);
+        }
+
+        if (myChunk1.GetMesh())
+        {
+            glm::mat4 modelMatrix2 = glm::mat4(1.0f);
+            modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(16.2f, 0.0f, 0.0f));
+            Renderer::DrawMesh(*myChunk2.GetMesh(), modelMatrix2);
+        }
 
         // =============================
         // Finish rendering
