@@ -275,7 +275,7 @@ int main() {
 
         timeUtility.Update();
 
-        Renderer::ClearScreen(glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+        Renderer::ClearScreen(glm::vec4(127.0f / 255.0f, 205.0f / 255.0f, 254.0f / 255.0f, 1.0f));
 
         float timeValue = glfwGetTime();
         float sineValue = sin(timeValue) * 100.0f;
