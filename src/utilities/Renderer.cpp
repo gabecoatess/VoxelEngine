@@ -1,11 +1,13 @@
 // Renderer.cpp
 
 #include "Renderer.h"
+#include "ResourceManager.h"
 
 #include <glad/glad.h>
 
 std::vector<Camera*> Renderer::cameras;
 Camera* Renderer::currentCamera = nullptr;
+Shader* Renderer::defaultShader = nullptr;
 
 void Renderer::Initialize()
 {
@@ -20,6 +22,8 @@ void Renderer::Initialize(Camera& camera)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	currentCamera = &camera;
+
+	defaultShader = ResourceManager::LoadShader("default_vertex.glsl", "default_fragment.glsl", "default");
 }
 
 void Renderer::SetViewport(float width, float height)
@@ -44,6 +48,11 @@ void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4&
 	glm::mat4 mvp = currentCamera->GetProjectionMatrix() * currentCamera->GetViewMatrix() * modelMatrix;
 	shader.setMat4("sMatrices", mvp);
 	mesh.Draw();
+}
+
+void Renderer::DrawMesh(const Mesh& mesh, const glm::mat4& modelMatrix)
+{
+	DrawMesh(mesh, *defaultShader, modelMatrix);
 }
 
 Camera& Renderer::GetCurrentCamera()

@@ -12,7 +12,6 @@
 #include "utilities/Mesh.h"
 #include "utilities/Renderer.h"
 #include "utilities/TimeUtility.h"
-#include "utilities/Shader.h"
 #include "objects/Camera.h"
 #include "thirdparty/stb_image.h"
 
@@ -164,71 +163,6 @@ int main() {
     Renderer::Initialize(cam);
     timeUtility.Initialize();
 
-    // Triangle data
-    const std::vector<float> cubeVertices = {
-        // POSITIONS            // COLORS           // TEXCOORDS
-        // Front face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-
-        // Back face
-         0.5f,  0.5f, -0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-
-        // Right face
-         0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-
-         // Left face
-         -0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-
-         // Top face
-          0.5f,  0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         -0.5f,  0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-          0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
-
-         // Bottom face
-          0.5f, -0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
-         -0.5f, -0.5f,  0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-          0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,   0.0f, 1.0f
-    };
-    const std::vector<unsigned int> cubeIndices = {
-        // Front face
-        2,  1,  0,
-        3,  2,  0,
-
-        // Back face
-        4,  5,  6,
-        4,  6,  7,
-
-        // Right face
-        8,  9,  10,
-        8,  10, 11,
-
-        // Left face
-        14, 13, 12,
-        15, 14, 12,
-
-        // Top face
-        18, 17, 16,
-        17, 18, 19,
-
-        // Bottom face
-        20, 21, 22,
-        23, 22, 21
-    };
-
     // Triangle Texture Object
     unsigned int texture;
     glGenTextures(1, &texture);
@@ -260,8 +194,6 @@ int main() {
     // Free memory 
     stbi_image_free(data);
 
-    Shader* defaultShader = ResourceManager::LoadShader("default_vertex.glsl", "default_fragment.glsl", "default");
-
     cam.Initialize();
 
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
@@ -284,7 +216,7 @@ int main() {
 
         glBindTexture(GL_TEXTURE_2D, texture);
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        Renderer::DrawMesh(chunkMesh, *defaultShader, modelMatrix);
+        Renderer::DrawMesh(chunkMesh, modelMatrix);
 
         // =============================
         // Finish rendering

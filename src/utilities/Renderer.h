@@ -7,6 +7,7 @@
 
 #include "Shader.h"
 #include "Mesh.h"
+#include "ResourceManager.h"
 #include "../objects/Camera.h"
 
 class Renderer
@@ -19,6 +20,7 @@ public:
 	static void ClearScreen(const glm::vec4& color);
 
 	static void DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& modelMatrix);
+	static void DrawMesh(const Mesh& mesh, const glm::mat4& modelMatrix);
 
 	static Camera& GetCurrentCamera();
 	static void SetCurrentCamera(Camera& camera) { currentCamera = &camera; }
@@ -33,6 +35,7 @@ public:
 private:
 	static Camera* currentCamera;
 	static std::vector<Camera*> cameras;
+	static Shader* defaultShader;
 };
 
 #endif
