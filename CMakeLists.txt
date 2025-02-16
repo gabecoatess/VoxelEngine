@@ -29,6 +29,7 @@ add_library(glad
 	src/utilities/ResourceManager.cpp
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
+	src/world/Chunk.cpp
 	src/objects/Camera.cpp
 )
 target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
@@ -47,6 +48,7 @@ add_executable(VoxelEngine
 	src/utilities/TimeUtility.cpp
 	src/utilities/Shader.cpp
 	src/thirdparty/stb_image.cpp
+	src/world/Chunk.cpp
 	src/objects/Camera.cpp
 )
 target_link_libraries(VoxelEngine PRIVATE common_includes glfw glad OpenGL::GL)

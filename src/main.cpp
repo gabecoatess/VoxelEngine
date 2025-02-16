@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#include "world/Chunk.h"
 #include "utilities/ResourceManager.h"
 #include "utilities/Mesh.h"
 #include "utilities/Renderer.h"
@@ -266,8 +267,9 @@ int main() {
     Renderer::SetViewport(currentWinWidth, currentWinHeight);
 	Renderer::UpdateAllCamerasAspectRatio(currentWinWidth, currentWinHeight);
 
-    Mesh cubeMesh(cubeVertices, cubeIndices);
-    Mesh cubeMesh2(cubeVertices, cubeIndices);
+    Chunk myChunk;
+    myChunk.GenerateData();
+    Mesh chunkMesh = myChunk.GenerateMesh();
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -282,7 +284,7 @@ int main() {
 
         glBindTexture(GL_TEXTURE_2D, texture);
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        Renderer::DrawMesh(cubeMesh, *defaultShader, modelMatrix);
+        Renderer::DrawMesh(chunkMesh, *defaultShader, modelMatrix);
 
         // =============================
         // Finish rendering
