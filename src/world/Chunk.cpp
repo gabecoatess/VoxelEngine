@@ -2,7 +2,7 @@
 
 #include "Chunk.h"
 
-#include <memory>
+Chunk::Chunk(const glm::ivec3& gridPosition)
 #include <vector>
 
 Chunk::Chunk()
@@ -210,4 +210,9 @@ const Mesh* Chunk::GetMesh() const
 const MultiDimArray& Chunk::GetData() const
 {
 	return _data;
+}
+
+glm::mat4 Chunk::GetModelMatrix() const
+{
+	return glm::translate(glm::mat4(1.0f), glm::vec3(_gridPosition.x * CHUNK_WIDTH, _gridPosition.y * CHUNK_HEIGHT, _gridPosition.z * CHUNK_DEPTH));
 }
