@@ -238,10 +238,7 @@ int main() {
     for (size_t i = 0; i < world.size(); i++)
     {
         world[i]->GenerateData();
-        std::cout << "Generated Chunk [" << i << "]" << std::endl;
     }
-
-    std::cout << sizeof(world) << std::endl;
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
